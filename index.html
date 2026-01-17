@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarry House Menu</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#f5f5f5;
+  margin:10px;
+}
+h1{text-align:center}
+.section{
+  margin-top:25px;
+}
+.section h2{
+  background:#222;
+  color:#fff;
+  padding:10px;
+  border-radius:8px;
+  text-align:center;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:12px;
+}
+.card{
+  background:#fff;
+  padding:10px;
+  border-radius:10px;
+  text-align:center;
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+.card b{
+  font-size:14px;
+}
+.card button{
+  margin-top:8px;
+  padding:8px;
+  width:100%;
+  border:none;
+  border-radius:6px;
+  background:#007bff;
+  color:white;
+}
+.order-box{
+  background:#fff;
+  padding:15px;
+  border-radius:10px;
+  margin-top:30px;
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+.order-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:6px;
+  font-size:14px;
+}
+.order-item button{
+  border:none;
+  background:#dc3545;
+  color:white;
+  border-radius:4px;
+  padding:4px 8px;
+}
+.total{
+  font-size:18px;
+  font-weight:bold;
+  margin-top:10px;
+}
+input{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+.send{
+  background:#28a745;
+  color:white;
+  border:none;
+  padding:14px;
+  margin-top:15px;
+  width:100%;
+  font-size:16px;
+  border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🍽️ Tarry House</h1>
+
+<!-- ========= MAKANAN ========= -->
+<div class="section">
+  <h2>🍛 MAKANAN</h2>
+  <div id="makanan" class="grid"></div>
+</div>
+
+<!-- ========= MINUMAN ========= -->
+<div class="section">
+  <h2>🥤 MINUMAN</h2>
+  <div id="minuman" class="grid"></div>
+</div>
+
+<!-- ========= PESANAN ========= -->
+<div class="order-box">
+  <h2>📝 PESANAN ANDA</h2>
+  <div id="orderList">Belum ada pesanan</div>
+  <div class="total" id="total">Total: ¥0</div>
+
+  <input id="nama" placeholder="Nama Pemesan">
+  <button class="send" onclick="kirim()">KIRIM PESANAN</button>
+</div>
+
+<script>
+/* ================= KONFIG ================= */
+const ORDER_API = "https://script.google.com/macros/s/AKfycbw0pBCRvUghmVErd7t0fdhHsRgRg1dP3apV64_Mq_-3E9qAro9CjyRPHSRcQQOt7grdDg/exec";
+
+/* ================= DATA MENU ================= */
+const makanan = [
+ {nama:"Nasi Campur",harga:1400},
+ {nama:"Nasi Goreng Spesial",harga:1600},
+ {nama:"Sate Kambing + Nasi",harga:1600},
+ {nama:"Nasi Padang",harga:1600},
+ {nama:"Gurame Goreng + Nasi",harga:1500},
+ {nama:"Gurame Bakar + Nasi",harga:1600},
+ {nama:"Bakso",harga:1000},
+ {nama:"Rice Rica",harga:1400},
+ {nama:"Tempe Mendoan",harga:1000},
+ {nama:"Pecel Lele + Nasi",harga:1300},
+ {nama:"Ayam Geprek + Nasi",harga:1400},
+ {nama:"Pecel Ayam + Nasi",harga:1400},
+ {nama:"Ayam Bakar + Nasi",harga:1500},
+ {nama:"Gurame Santan + Nasi",harga:1700},
+ {nama:"Soto Ayam + Nasi",harga:1000},
+ {nama:"Nasi",harga:200}
+];
+
+const minuman = [
+ {nama:"Jus Alpukat",harga:600},
+ {nama:"Jus Mangga",harga:500},
+ {nama:"Es Pop Ice",harga:600},
+ {nama:"NAMA BEER",harga:700},
+ {nama:"BINTANG BEER",harga:800},
+ {nama:"Es Teh",harga:400},
+ {nama:"Kopi",harga:500}
+];
+
+/* ================= LOGIC ================= */
+let pesanan = [];
+
+function renderMenu(list, target){
+  list.forEach(m=>{
+    target.innerHTML += `
+      <div class="card">
+        <b>${m.nama}</b><br>¥${m.harga}
+        <button onclick='tambah("${m.nama}",${m.harga})'>Tambah</button>
+      </div>`;
+  });
+}
+
+function tambah(nama,harga){
+  pesanan.push({nama,harga});
+  renderPesanan();
+}
+
+function hapus(i){
+  pesanan.splice(i,1);
+  renderPesanan();
+}
+
+function renderPesanan(){
+  if(pesanan.length===0){
+    orderList.innerHTML="Belum ada pesanan";
+    total.innerText="Total: ¥0";
+    return;
+  }
+  let html="";
+  let sum=0;
+  pesanan.forEach((p,i)=>{
+    sum+=p.harga;
+    html+=`
+      <div class="order-item">
+        ${p.nama} (¥${p.harga})
+        <button onclick="hapus(${i})">Hapus</button>
+      </div>`;
+  });
+  orderList.innerHTML=html;
+  total.innerText="Total: ¥"+sum;
+}
+
+function kirim(){
+  const nama=document.getElementById("nama").value;
+  if(!nama || pesanan.length===0){
+    alert("Nama & pesanan harus diisi");
+    return;
+  }
+
+  const menuText = pesanan.map(p=>p.nama).join(", ");
+  const jumlah = pesanan.length;
+
+  if(!confirm(
+    "KONFIRMASI PESANAN\n\n"+
+    menuText+
+    "\n\n"+total.innerText
+  )) return;
+
+  fetch(ORDER_API,{
+    method:"POST",
+    body:JSON.stringify({nama,menu:menuText,jumlah})
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    alert("Pesanan berhasil!\nOrder ID: "+d.orderId);
+    location.reload();
+  });
+}
+
+/* ================= INIT ================= */
+renderMenu(makanan, document.getElementById("makanan"));
+renderMenu(minuman, document.getElementById("minuman"));
+</script>
+
+</body>
+</html>
