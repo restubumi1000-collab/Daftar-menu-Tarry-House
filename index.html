@@ -12,9 +12,7 @@ body{
   margin:10px;
 }
 h1{text-align:center}
-.section{
-  margin-top:25px;
-}
+.section{margin-top:25px;}
 .section h2{
   background:#222;
   color:#fff;
@@ -35,9 +33,7 @@ h1{text-align:center}
   text-align:center;
   box-shadow:0 2px 6px rgba(0,0,0,.15);
 }
-.card b{
-  font-size:14px;
-}
+.card b{font-size:14px;}
 .card button{
   margin-top:8px;
   padding:8px;
@@ -97,19 +93,16 @@ input{
 
 <h1>🍽️ Tarry House</h1>
 
-<!-- ========= MAKANAN ========= -->
 <div class="section">
   <h2>🍛 MAKANAN</h2>
   <div id="makanan" class="grid"></div>
 </div>
 
-<!-- ========= MINUMAN ========= -->
 <div class="section">
   <h2>🥤 MINUMAN</h2>
   <div id="minuman" class="grid"></div>
 </div>
 
-<!-- ========= PESANAN ========= -->
 <div class="order-box">
   <h2>📝 PESANAN ANDA</h2>
   <div id="orderList">Belum ada pesanan</div>
@@ -196,6 +189,18 @@ function renderPesanan(){
   total.innerText="Total: ¥"+sum;
 }
 
+/* ===== FORMAT MENU MENURUN DALAM 1 CELL ===== */
+function formatMenu(menuArray){
+  const counter = {};
+  menuArray.forEach(p=>{
+    const key = p.nama.toUpperCase();
+    counter[key] = (counter[key] || 0) + 1;
+  });
+  return Object.entries(counter)
+    .map(([nama,jumlah]) => `${nama} (${jumlah})`)
+    .join("\n");
+}
+
 function kirim(){
   const nama=document.getElementById("nama").value;
   if(!nama || pesanan.length===0){
@@ -203,7 +208,7 @@ function kirim(){
     return;
   }
 
-  const menuText = pesanan.map(p=>p.nama).join(", ");
+  const menuText = formatMenu(pesanan);
   const jumlah = pesanan.length;
 
   if(!confirm(
@@ -230,5 +235,3 @@ renderMenu(minuman, document.getElementById("minuman"));
 
 </body>
 </html>
-
-
